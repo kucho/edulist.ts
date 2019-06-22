@@ -3,6 +3,7 @@ import readline from "readline";
 import { naves, rutas } from "./config";
 import "./extenders";
 import { readList } from "./reader";
+import * as wr from "./writer";
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -13,8 +14,10 @@ rl.question("Ingrese los nombres de los archivos a procesar: ", (answer) => {
 
     const names = answer.cleanSpaces().split(" ");
     for (const name of names) {
-        readList("../" + name + ".xlsx", rutas, naves);
+        const data = readList(name, rutas, naves);
+        if (data !== false) {
+            wr.writeEduList(data.targetRuta, data.config, naves);
+        }
     }
-
     rl.close();
 });

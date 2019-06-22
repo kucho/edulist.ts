@@ -1,6 +1,7 @@
 class Pasajero {
     public nombres: string;
     public apellidos: string;
+    public nombrecorto: string;
     public edad: number;
     public sexo: string;
     public nacionalidad: string;
@@ -16,6 +17,12 @@ class Pasajero {
 
         this.nombres = nombres;
         this.apellidos = apellidos;
+        const pNombre = nombres.split(" ")[0];
+        let pApellido = apellidos.split(" ")[0];
+        if (pApellido.length <= 3) {
+            pApellido = apellidos.split(" ")[0] + " " + apellidos.split(" ")[1];
+        }
+        this.nombrecorto = pApellido + " " + pNombre;
         this.edad = edad;
         this.sexo = sexo;
         this.nacionalidad = nacionalidad;

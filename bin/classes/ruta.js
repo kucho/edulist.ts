@@ -5,5 +5,8 @@ class Ruta {
         this.nombre = nombre;
         this.puntos = puntos;
     }
+    revertir() {
+        this.puntos.reverse();
+    }
 }
 exports.Ruta = Ruta;
