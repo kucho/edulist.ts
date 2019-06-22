@@ -7,7 +7,7 @@ import { Ruta } from "./classes/ruta";
 
 function readList(filepath: string, rutaList: Ruta[], naveList: Nave[]) {
 
-    const realpath = path.resolve(__dirname, "../" + filepath + ".xlsx");
+    const realpath = path.join(path.dirname(process.execPath), "./" + filepath + ".xlsx");
 
     const exists = fs.existsSync(realpath);
     if (exists === true) {

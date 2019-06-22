@@ -5,7 +5,7 @@ import { Nave } from "./classes/nave";
 import { Punto } from "./classes/punto";
 import { Ruta } from "./classes/ruta";
 
-const filepath = path.resolve(__dirname, "../config.toml");
+const filepath = path.join(path.dirname(process.execPath), "./config.toml");
 const defaultConfig = `# Archivo de configuración del generador de rutas
 
 [[rutas]]

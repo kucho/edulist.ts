@@ -2,10 +2,11 @@
     "name": "edulist.ts",
     "version": "1.0.0",
     "description": "Generador de listas Supervisor y Capitanía de EDUEXPRESS",
-    "main": "index.js",
+    "main": "./bin/main.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc --outDir bin"
+        "build": "tsc --outDir bin",
+        "build-exe": "pkg -t win-x64 -o ./EduList ./bin/main.js"
     },
     "repository": {
         "type": "git",
@@ -25,5 +26,8 @@
         "toml": "^3.0.0",
         "ts-node": "^8.3.0",
         "xlsx": "^0.14.3"
+    },
+    "pkg": {
+        "assets": "./**/express-pkg/node_modules/pg-escape/reserved.txt"
     }
 }

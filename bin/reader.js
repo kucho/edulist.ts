@@ -8,13 +8,13 @@ const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const pasajero_1 = require("./classes/pasajero");
 function readList(filepath, rutaList, naveList) {
-    const realpath = path_1.default.resolve(__dirname, "../" + filepath + ".xlsx");
+    const realpath = path_1.default.join(path_1.default.dirname(process.execPath), "./" + filepath + ".xlsx");
     const exists = fs_1.default.existsSync(realpath);
     if (exists === true) {
-        global.console.log(`[✓] Lista ${filepath}.xlsx encontrada... OK`);
+        global.console.log(`[✓] Lista "${filepath}.xlsx" encontrada... OK`);
     }
     else {
-        global.console.log(`[✗] La lista ${filepath}.xlsx no fue encontrada... ERROR`);
+        global.console.log(`[✗] La lista "${filepath}.xlsx" no fue encontrada... ERROR`);
         return false;
     }
     const workbook = xlsx_1.default.readFile(realpath);

@@ -12,7 +12,7 @@ function writeEduList(data, config, naveList) {
     writeCapList(wb, data, config, naveList);
     filename = checkFileName(filename);
     wb.xlsx.writeFile(`./${filename}.xlsx`).then(() => {
-        global.console.log(`[✓] Se creó la lista ${filename}.xlsx`);
+        global.console.log(`[✓] Se creó la lista "${filename}.xlsx"... OK`);
     });
 }
 exports.writeEduList = writeEduList;

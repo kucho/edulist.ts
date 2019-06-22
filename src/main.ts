@@ -2,6 +2,7 @@
 import readline from "readline";
 import { naves, rutas } from "./config";
 import "./extenders";
+import { exitEduList } from "./helper";
 import { readList } from "./reader";
 import * as wr from "./writer";
 
@@ -20,4 +21,5 @@ rl.question("Ingrese los nombres de los archivos a procesar: ", (answer) => {
         }
     }
     rl.close();
+    exitEduList("[RESULTADO]");
 });

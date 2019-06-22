@@ -14,6 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const readline_1 = __importDefault(require("readline"));
 const config_1 = require("./config");
 require("./extenders");
+const helper_1 = require("./helper");
 const reader_1 = require("./reader");
 const wr = __importStar(require("./writer"));
 const rl = readline_1.default.createInterface({
@@ -29,4 +30,5 @@ rl.question("Ingrese los nombres de los archivos a procesar: ", (answer) => {
         }
     }
     rl.close();
+    helper_1.exitEduList("[RESULTADO]");
 });

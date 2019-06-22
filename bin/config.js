@@ -8,7 +8,7 @@ const path_1 = __importDefault(require("path"));
 const toml_1 = __importDefault(require("toml"));
 const punto_1 = require("./classes/punto");
 const ruta_1 = require("./classes/ruta");
-const filepath = path_1.default.resolve(__dirname, "../config.toml");
+const filepath = path_1.default.join(path_1.default.dirname(process.execPath), "./config.toml");
 const defaultConfig = `# Archivo de configuración del generador de rutas
 
 [[rutas]]
