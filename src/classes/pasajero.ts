@@ -10,10 +10,11 @@ class Pasajero {
     public destino: string;
     public comprobante: string;
     public monto: number;
+    public asiento:string;
 
     constructor(
         nombres: string, apellidos: string, edad: number, sexo: string, nacionalidad: string,
-        documento: string, origen: string, destino: string, comprobante: string, monto: number) {
+        documento: string, origen: string, destino: string, comprobante: string, monto: number, asiento: string) {
 
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -31,6 +32,7 @@ class Pasajero {
         this.destino = destino;
         this.comprobante = comprobante;
         this.monto = monto;
+        this.asiento=asiento;
     }
 }
 

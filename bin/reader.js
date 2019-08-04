@@ -10,7 +10,7 @@ const pasajero_1 = require("./classes/pasajero");
 function readList(filepath, rutaList, naveList) {
     const realpath = path_1.default.join(path_1.default.dirname(process.execPath), "./" + filepath + ".xlsx");
     const exists = fs_1.default.existsSync(realpath);
-    if (exists === true) {
+    if (exists) {
         global.console.log(`[✓] Lista "${filepath}.xlsx" encontrada... OK`);
     }
     else {
@@ -40,6 +40,9 @@ function readList(filepath, rutaList, naveList) {
     const targetRuta = rutaList[isRutaValid];
     const range = xlsx_1.default.utils.decode_range(worksheet["!ref"] || "");
     const nRows = range.e.r - range.s.r + 1;
+    /* Definimos el array de asientos */
+    const asientos = [];
+    const asientosDup = [];
     for (let i = 2; i < nRows; i++) {
         /* Sacamos los valores que utilizaremos para crear nuestro pasajero */
         const nombres = worksheet[xlsx_1.default.utils.encode_cell({ r: i, c: 1 })].v.cleanSpaces().toTitle();
@@ -52,12 +55,25 @@ function readList(filepath, rutaList, naveList) {
         const destino = worksheet[xlsx_1.default.utils.encode_cell({ r: i, c: 8 })].v.cleanSpaces();
         const comprobante = worksheet[xlsx_1.default.utils.encode_cell({ r: i, c: 9 })].v.cleanSpaces();
         const monto = +worksheet[xlsx_1.default.utils.encode_cell({ r: i, c: 10 })].v.cleanSpaces().substring(3);
-        const pasajero = new pasajero_1.Pasajero(nombres, apellidos, edad, sexo, nacionalidad, documento, origen, destino, comprobante, monto);
+        let asiento = worksheet[xlsx_1.default.utils.encode_cell({ r: i, c: 11 })].v.cleanSpaces();
+        if (asiento.length > 3) {
+            asiento = "";
+        }
+        const pasajero = new pasajero_1.Pasajero(nombres, apellidos, edad, sexo, nacionalidad, documento, origen, destino, comprobante, monto, asiento);
         const iPuntoOrigen = targetRuta.puntos.findIndex((p) => p.nombre.toTitle() === origen.toTitle());
         const iPuntoDestino = targetRuta.puntos.findIndex((p) => p.nombre.toTitle() === destino.toTitle());
         if (iPuntoOrigen > -1 && iPuntoDestino > -1) {
             targetRuta.puntos[iPuntoOrigen].suben.push(pasajero);
             targetRuta.puntos[iPuntoDestino].bajan.push(pasajero);
+        }
+        /* Verificamos si existen asientos duplicados durante la lectura */
+        const found = asientos.find((k) => k === asiento);
+        if (!found) {
+            asientos.push(asiento);
+        }
+        else {
+            asientosDup.push(asiento);
+            global.console.log(`[✗] Asiento duplicado: ${pasajero.asiento} - DOC ${pasajero.documento}`);
         }
     }
     if (trayecto.toUpperCase() === "SURCADA") {
@@ -66,7 +82,7 @@ function readList(filepath, rutaList, naveList) {
     for (const p of targetRuta.puntos) {
         p.order();
     }
-    return { targetRuta, config };
+    return { targetRuta, config, asientosDup };
 }
 exports.readList = readList;
 function checkConfig(rutaList, naveList, config) {
@@ -90,7 +106,7 @@ function checkConfig(rutaList, naveList, config) {
     }
     /* Comprobamos la fecha y mandamos una advertencia si está mal */
     const d = new Date(config.fecha);
-    if (d.isValid() === false) {
+    if (!d.isValid()) {
         global.console.log("[⚠ ] La fecha no tiene un formato válido... ADVERTENCIA");
     }
     else {

@@ -8,9 +8,8 @@ import { Ruta } from "./classes/ruta";
 function readList(filepath: string, rutaList: Ruta[], naveList: Nave[]) {
 
     const realpath = path.join(path.dirname(process.execPath), "./" + filepath + ".xlsx");
-
     const exists = fs.existsSync(realpath);
-    if (exists === true) {
+    if (exists) {
         global.console.log(`[✓] Lista "${filepath}.xlsx" encontrada... OK`);
     } else {
         global.console.log(`[✗] La lista "${filepath}.xlsx" no fue encontrada... ERROR`);
@@ -45,6 +44,10 @@ function readList(filepath: string, rutaList: Ruta[], naveList: Nave[]) {
     const range = XLSX.utils.decode_range(worksheet["!ref"] || "");
     const nRows = range.e.r - range.s.r + 1;
 
+    /* Definimos el array de asientos */
+    const asientos: string[] = [];
+    const asientosDup: string[] = [];
+
     for (let i = 2; i < nRows; i++) {
 
         /* Sacamos los valores que utilizaremos para crear nuestro pasajero */
@@ -58,9 +61,13 @@ function readList(filepath: string, rutaList: Ruta[], naveList: Nave[]) {
         const destino = worksheet[XLSX.utils.encode_cell({ r: i, c: 8 })].v.cleanSpaces();
         const comprobante = worksheet[XLSX.utils.encode_cell({ r: i, c: 9 })].v.cleanSpaces();
         const monto = +worksheet[XLSX.utils.encode_cell({ r: i, c: 10 })].v.cleanSpaces().substring(3);
+        let asiento = worksheet[XLSX.utils.encode_cell({ r: i, c: 11 })].v.cleanSpaces();
+        if (asiento.length > 3) {
+            asiento = "";
+        }
 
         const pasajero = new Pasajero(nombres, apellidos, edad, sexo, nacionalidad,
-            documento, origen, destino, comprobante, monto);
+            documento, origen, destino, comprobante, monto, asiento);
 
         const iPuntoOrigen = targetRuta.puntos.findIndex((p) => p.nombre.toTitle() === origen.toTitle());
         const iPuntoDestino = targetRuta.puntos.findIndex((p) => p.nombre.toTitle() === destino.toTitle());
@@ -68,6 +75,16 @@ function readList(filepath: string, rutaList: Ruta[], naveList: Nave[]) {
         if (iPuntoOrigen > -1 && iPuntoDestino > -1) {
             targetRuta.puntos[iPuntoOrigen].suben.push(pasajero);
             targetRuta.puntos[iPuntoDestino].bajan.push(pasajero);
+        }
+
+        /* Verificamos si existen asientos duplicados durante la lectura */
+        const found = asientos.find((k) => k === asiento);
+
+        if (!found) {
+            asientos.push(asiento);
+        } else {
+            asientosDup.push(asiento);
+            global.console.log(`[✗] Asiento duplicado: ${pasajero.asiento} - DOC ${pasajero.documento}`);
         }
     }
 
@@ -79,7 +96,7 @@ function readList(filepath: string, rutaList: Ruta[], naveList: Nave[]) {
         p.order();
     }
 
-    return { targetRuta, config };
+    return { targetRuta, config, asientosDup };
 }
 
 function checkConfig(
@@ -108,7 +125,7 @@ function checkConfig(
     /* Comprobamos la fecha y mandamos una advertencia si está mal */
     const d = new Date(config.fecha);
 
-    if (d.isValid() === false) {
+    if (!d.isValid()) {
         global.console.log("[⚠ ] La fecha no tiene un formato válido... ADVERTENCIA");
     } else { global.console.log("[✓] La fecha es válida... OK"); }
 

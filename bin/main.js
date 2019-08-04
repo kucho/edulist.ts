@@ -26,7 +26,7 @@ rl.question("Ingrese los nombres de los archivos a procesar: ", (answer) => {
     for (const name of names) {
         const data = reader_1.readList(name, config_1.rutas, config_1.naves);
         if (data !== false) {
-            wr.writeEduList(data.targetRuta, data.config, config_1.naves);
+            wr.writeEduList(data.targetRuta, data.config, config_1.naves, data.asientosDup);
         }
     }
     rl.close();

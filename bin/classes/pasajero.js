@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Pasajero {
-    constructor(nombres, apellidos, edad, sexo, nacionalidad, documento, origen, destino, comprobante, monto) {
+    constructor(nombres, apellidos, edad, sexo, nacionalidad, documento, origen, destino, comprobante, monto, asiento) {
         this.nombres = nombres;
         this.apellidos = apellidos;
         const pNombre = nombres.split(" ")[0];
@@ -18,6 +18,7 @@ class Pasajero {
         this.destino = destino;
         this.comprobante = comprobante;
         this.monto = monto;
+        this.asiento = asiento;
     }
 }
 exports.Pasajero = Pasajero;

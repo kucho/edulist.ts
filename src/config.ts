@@ -40,7 +40,7 @@ capacidad = 83`;
 
 const exists = fs.existsSync(filepath);
 
-if (exists === true) {
+if (exists) {
     global.console.log("[✓] Archivo de configuración correcto... OK");
 } else {
     global.console.log("[✗] El archivo de configuración no existe... ERROR");

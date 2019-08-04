@@ -5,10 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const exceljs_1 = __importDefault(require("exceljs"));
 const fs_1 = __importDefault(require("fs"));
-function writeEduList(data, config, naveList) {
+function writeEduList(data, config, naveList, asientosDup) {
     const wb = new exceljs_1.default.Workbook();
     let filename = `Lista ${config.nave} - ${config.fecha} - ${config.trayecto}`;
-    writeSupList(wb, data, config);
+    writeSupList(wb, data, config, asientosDup);
     writeCapList(wb, data, config, naveList);
     filename = checkFileName(filename);
     wb.xlsx.writeFile(`./${filename}.xlsx`).then(() => {
@@ -20,9 +20,9 @@ function checkFileName(filename) {
     let c = 1;
     while (true) {
         const exists = fs_1.default.existsSync(`./${filename}.xlsx`);
-        if (exists === true) {
+        if (exists) {
             const duplicate = parseInt(filename.substring(filename.length - 2, filename.length - 1), 10);
-            if (isNaN(duplicate) === true) {
+            if (isNaN(duplicate)) {
                 filename = filename + ` (${c})`;
                 c++;
                 checkFileName(filename);
@@ -35,7 +35,6 @@ function checkFileName(filename) {
         }
         else {
             return filename;
-            break;
         }
     }
 }
@@ -280,12 +279,12 @@ function writeCapList(wb, data, config, naveList) {
             "en enceso de la lista de destino... ADVERTENCIA");
     }
 }
-function writeSupList(wb, data, config) {
+function writeSupList(wb, data, config, asientosDup) {
     const ws = wb.addWorksheet("LISTA - SUPERVISOR");
     ws.properties.defaultRowHeight = 22;
     ws.pageSetup.orientation = "landscape";
     ws.pageSetup.paperSize = 9;
-    ws.pageSetup.margins = { top: 0.3, bottom: 0.3, left: 0.8, right: 0.8, header: 0, footer: 0 };
+    ws.pageSetup.margins = { top: 0.3, bottom: 0.3, left: 0.4, right: 0.4, header: 0, footer: 0 };
     /* Cargamos el logo */
     const logo = wb.addImage({
         buffer: fs_1.default.readFileSync("./assets/logo.png"),
@@ -302,29 +301,31 @@ function writeSupList(wb, data, config) {
     ws.getCell("C1").value = `LISTA DE ZARPE - SUPERVISOR`;
     setBorder(ws, 1, 1, 3);
     ws.getCell("C1").font = { size: 14, bold: true };
-    ws.mergeCells("C1:M1");
+    ws.mergeCells("C1:O1");
     ws.getCell("C2").value = `Embarcación: ${config.nave} | Placa: ${config.placa} | ${config.ruta}`;
     setBorder(ws, 1, 2, 3);
     ws.getCell("C2").font = { size: 14, bold: true };
-    ws.mergeCells("C2:M2");
+    ws.mergeCells("C2:O2");
     ws.getCell("C3").value = `Trayecto: ${config.trayecto} | Fecha: ${config.fecha}`;
     setBorder(ws, 1, 3, 3);
     ws.getCell("C3").font = { size: 14, bold: true };
-    ws.mergeCells("C3:M3");
+    ws.mergeCells("C3:O3");
     /* Ponemos el tallarín de la celdas */
     ws.getColumn("A").width = 4;
     ws.getColumn("B").width = 18;
-    ws.getColumn("C").width = 12;
+    ws.getColumn("C").width = 11;
     ws.getColumn("D").width = 6;
     ws.getColumn("E").width = 12;
     ws.getColumn("F").width = 8;
-    ws.getColumn("G").width = 8;
+    ws.getColumn("G").width = 7;
     ws.getColumn("H").width = 4;
-    ws.getColumn("I").width = 18;
-    ws.getColumn("J").width = 12;
-    ws.getColumn("K").width = 8;
-    ws.getColumn("L").width = 12;
-    ws.getColumn("M").width = 6;
+    ws.getColumn("I").width = 4;
+    ws.getColumn("J").width = 18;
+    ws.getColumn("K").width = 11;
+    ws.getColumn("L").width = 8;
+    ws.getColumn("M").width = 12;
+    ws.getColumn("N").width = 8;
+    ws.getColumn("O").width = 7;
     /* Alineamos las celdas */
     ws.getColumn("A").alignment = { vertical: "middle", horizontal: "center" };
     ws.getColumn("B").alignment = { vertical: "middle", horizontal: "left" };
@@ -334,37 +335,37 @@ function writeSupList(wb, data, config) {
     ws.getColumn("F").alignment = { vertical: "middle", horizontal: "center" };
     ws.getColumn("G").alignment = { vertical: "middle", horizontal: "center" };
     ws.getColumn("H").alignment = { vertical: "middle", horizontal: "center" };
-    ws.getColumn("I").alignment = { vertical: "middle", horizontal: "left" };
-    ws.getColumn("J").alignment = { vertical: "middle", horizontal: "center" };
+    ws.getColumn("I").alignment = { vertical: "middle", horizontal: "center" };
+    ws.getColumn("J").alignment = { vertical: "middle", horizontal: "left" };
     ws.getColumn("K").alignment = { vertical: "middle", horizontal: "center" };
     ws.getColumn("L").alignment = { vertical: "middle", horizontal: "center" };
     ws.getColumn("M").alignment = { vertical: "middle", horizontal: "center" };
+    ws.getColumn("O").alignment = { vertical: "middle", horizontal: "center" };
     let r = 4;
     const sCol = 1;
-    const bCol = 8;
+    const bCol = 9;
     for (const p of data.puntos) {
         /* Si están vacíos no hacemos nada */
         if (p.suben.length === 0 && p.bajan.length === 0) {
             continue;
         }
         /* Cabecera */
-        setBorder(ws, 5, r, 1);
         ws.getRow(r).height = 22;
         ws.getRow(r).getCell(sCol).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "c2cee0" } };
         ws.getRow(r).getCell(sCol).font = { bold: true, size: 13 };
         ws.getRow(r).getCell(sCol).value = p.nombre;
-        ws.mergeCells(`A${r}:M${r}`);
+        ws.mergeCells(`A${r}:O${r}`);
         r++;
         ws.getRow(r).height = 22;
         ws.getRow(r).getCell(sCol).value = "Suben en este punto";
         ws.getRow(r).getCell(sCol).font = { bold: true, size: 12 };
-        ws.mergeCells(`A${r}:F${r}`);
+        ws.mergeCells(`A${r}:G${r}`);
         ws.getRow(r).getCell(bCol).value = "Bajan en este punto";
         ws.getRow(r).getCell(bCol).font = { bold: true, size: 12 };
-        ws.mergeCells(`H${r}:M${r}`);
+        ws.mergeCells(`I${r}:O${r}`);
         r++;
         /* Ponemos cabecera a los cuadros de surcada*/
-        setBorder(ws, 6, r, 1);
+        setBorder(ws, 7, r, sCol);
         ws.getRow(r).height = 22;
         ws.getRow(r).getCell(sCol).value = "Nº";
         ws.getRow(r).getCell(sCol + 1).value = "Nombres";
@@ -374,14 +375,16 @@ function writeSupList(wb, data, config) {
         ws.getRow(r).getCell(sCol + 3).value = "Edad";
         ws.getRow(r).getCell(sCol + 4).value = "Destino";
         ws.getRow(r).getCell(sCol + 5).value = "Precio";
+        ws.getRow(r).getCell(sCol + 6).value = "Asiento";
         ws.getRow(r).getCell(sCol).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(sCol + 1).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(sCol + 2).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(sCol + 3).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(sCol + 4).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(sCol + 5).font = { bold: true, size: 11 };
+        ws.getRow(r).getCell(sCol + 6).font = { bold: true, size: 11 };
         /* Ponemos cabecera a los cuadros de bajada*/
-        setBorder(ws, 6, r, 8);
+        setBorder(ws, 7, r, bCol);
         ws.getRow(r).getCell(bCol).value = "Nº";
         ws.getRow(r).getCell(bCol + 1).value = "Nombres";
         ws.getRow(r).getCell(bCol + 1).alignment = { vertical: "middle", horizontal: "center" };
@@ -390,18 +393,20 @@ function writeSupList(wb, data, config) {
         ws.getRow(r).getCell(bCol + 3).value = "Edad";
         ws.getRow(r).getCell(bCol + 4).value = "Origen";
         ws.getRow(r).getCell(bCol + 5).value = "Precio";
+        ws.getRow(r).getCell(bCol + 6).value = "Asiento";
         ws.getRow(r).getCell(bCol).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(bCol + 1).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(bCol + 2).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(bCol + 3).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(bCol + 4).font = { bold: true, size: 11 };
         ws.getRow(r).getCell(bCol + 5).font = { bold: true, size: 11 };
+        ws.getRow(r).getCell(bCol + 6).font = { bold: true, size: 11 };
         r++;
         ws.getRow(r).height = 22;
         let cS = 0;
         let cB = 0;
         for (const s of p.suben) {
-            setBorder(ws, 6, r + cS, 1);
+            setBorder(ws, 7, r + cS, sCol);
             const rowS = ws.getRow(r + cS);
             rowS.height = 22;
             rowS.getCell(sCol).value = cS + 1;
@@ -410,10 +415,29 @@ function writeSupList(wb, data, config) {
             rowS.getCell(sCol + 3).value = s.edad;
             rowS.getCell(sCol + 4).value = s.destino;
             rowS.getCell(sCol + 5).value = "S/. " + s.monto;
+            if (s.asiento === "") {
+                if (s.edad < 3) {
+                    rowS.getCell(sCol + 6).value = "INF";
+                }
+                else {
+                    rowS.getCell(sCol + 6).value = "ND";
+                }
+            }
+            else {
+                rowS.getCell(sCol + 6).value = s.asiento;
+                const found = asientosDup.find((k) => k === s.asiento);
+                if (found) {
+                    rowS.getCell(sCol + 6).fill = {
+                        fgColor: { argb: "FFFFFF00" },
+                        pattern: "solid",
+                        type: "pattern",
+                    };
+                }
+            }
             cS++;
         }
         for (const b of p.bajan) {
-            setBorder(ws, 6, r + cB, 8);
+            setBorder(ws, 7, r + cB, bCol);
             const rowB = ws.getRow(r + cB);
             rowB.getCell(bCol).value = cB + 1;
             rowB.getCell(bCol + 1).value = b.nombrecorto;
@@ -421,6 +445,25 @@ function writeSupList(wb, data, config) {
             rowB.getCell(bCol + 3).value = b.edad;
             rowB.getCell(bCol + 4).value = b.origen;
             rowB.getCell(bCol + 5).value = "S/. " + b.monto;
+            if (b.asiento === "") {
+                if (b.edad < 3) {
+                    rowB.getCell(bCol + 6).value = "INF";
+                }
+                else {
+                    rowB.getCell(bCol + 6).value = "ND";
+                }
+            }
+            else {
+                rowB.getCell(bCol + 6).value = b.asiento;
+                const found = asientosDup.find((k) => k === b.asiento);
+                if (found) {
+                    rowB.getCell(bCol + 6).fill = {
+                        fgColor: { argb: "FFFFFF00" },
+                        pattern: "solid",
+                        type: "pattern",
+                    };
+                }
+            }
             cB++;
         }
         /* Añadimos el espacio necesario para el siguiente cuadro */

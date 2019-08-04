@@ -41,7 +41,7 @@ capacidad = 83
 nombre = "Eduardo IV"
 capacidad = 83`;
 const exists = fs_1.default.existsSync(filepath);
-if (exists === true) {
+if (exists) {
     global.console.log("[✓] Archivo de configuración correcto... OK");
 }
 else {
